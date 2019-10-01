@@ -1,0 +1,681 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage{listings} % Include the listings-package
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{wrapfig}
+\usepackage{mathtools}
+\usepackage{tikz-network}
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\bra{\langle}{\rvert}
+\DeclarePairedDelimiter\ket{\lvert}{\rangle}
+\DeclarePairedDelimiterX\braket[2]{\langle}{\rangle}{#1 \delimsize\vert #2}
+
+\def\odiv{\, {\ominus\hspace{-8.5pt} \div} \,}
+\definecolor{mygrey}{rgb}{0.1, 0.1, 0.1}
+\usetheme{Montpellier}
+\setbeamercolor{normal text}{fg=mygrey}
+
+\title{Decomposition Structures for Soft Constraints Evaluation Problems}
+\author{Laura Bussi}
+\titlegraphic{\includegraphics[width=100pt,height=57pt]{marchio_unipi_pant541.png}}
+\date{26/07/2019}
+\institute[Università di Pisa]
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Outline}
+\begin{itemize}
+	\item Introduction of an algebraic framework for representing and solving Soft 
+	Constraint Evaluation Problems
+	\begin{itemize}
+		\item Syntax inspired by process algebras
+	\end{itemize}
+	\item Correspondence between tree decompositions and terms of the SCEP algebra
+	\item Polyadic soft constraints as an interpretation of the given algebra
+	\item Examples of application
+\end{itemize}
+\end{frame}
+
+\section{Introduction}
+ 
+\subsection{Constraint Satisfaction Problems and dynamic programming}
+\begin{frame}
+\frametitle{Constraint Satisfaction Problems and dynamic programming}
+\begin{itemize}
+	\item Constraint Satisfaction Problems can be represented as (hyper)graphs
+	\begin{itemize}
+		\item Intuitively, given a domain of values, a set of variables and a set of constraints,
+		we want to find an assignment of the variables s.t. all the constraints are satisfied
+		\item Further operations required to combine or remove constraints
+		\item CSP solving is NP-complete
+	\end{itemize}
+\medskip
+	\item Dynamic programming applies well to CSPs:
+	\begin{itemize}
+		\item We can decompose the problem and then repeatedly solve the subproblems
+		\item Deciding the best decomposition is known as 
+		\emph{secondary optimization problem}: NP-complete
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Soft constraints}
+\begin{frame}
+\frametitle{Soft constraints}
+\begin{itemize}
+	\item More flexible than classical constraints
+	\begin{itemize}
+		\item Each soft constraint associates a certain assignement to a value in a poset
+		\item To solve an SCSP we seek for an assignement of the variable s.t. the total amount
+		is minimized or maximized, due to the fact that we express negative or positive
+		preferences
+	\end{itemize}
+\medskip
+	\item SCSPs are difficult to represent and compose
+	\begin{itemize}
+		\item Need for a generalisation which allows for representing both the problem's
+		structure and the solution process via an algebraic framework
+		\item Decomposition and solving are thus correct by construction
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algebraic structures for soft constraints}
+\begin{itemize}
+	\item Absortive semirings (also known as c-semirings) 
+	$\langle S, \oplus, \otimes, 0, 1 \rangle$
+	\begin{itemize}
+		\item The $\oplus$ operator is idempotent and 1 is its absorbing element
+		\item The $\otimes$ operator is associative and commutative
+	\end{itemize}
+\medskip
+	\item $\oplus$ is often used to induce the order on the elements of such a semiring
+	\begin{itemize}
+		\item We have $a \leq b \iff a \oplus b = b$
+	\end{itemize}
+\medskip
+	\item We use $\otimes$ to combine constraints
+\medskip
+	\item We may additionaly require some kind of "subtraction"
+	\begin{itemize}
+		\item Based on residuation theory
+		\item The residuation operator is a kind of weak inverse of $\otimes$
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algebraic structures for soft constraints}
+\begin{itemize}
+	\item Properties of semirings are useful for manipulating soft constraints
+	\begin{itemize}
+		\item Associativity and commutativity of $\otimes$ guarantee the order of combination
+		to be irrelevant
+		\item Absortivity enforces the fact that adding constraints decreases the number of
+		solutions
+		\item The existence of the $0$ element represents the crisp feature of total dislike
+		of any solution involving a certain assignement
+		\item The unit $1$ allows for modelling the crisp feature of "indifference" for a
+		certain constraint
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Polyadic Soft Constraints}
+\begin{itemize}
+	\item A formalism to manipulate soft constraints based on polyadic algebras
+	\begin{itemize}
+		\item Two families of operators, called \emph{cylindrification} and 
+		\emph{polyadic substitution} model variables hiding and parameters passing
+		\item Allows for a polynomial representation of soft constraints
+	\end{itemize}
+\medskip
+	\item This algebra respects both the weak and the strong
+	SCEP specification, thus representing an interpretation of the initial algebra
+\end{itemize}
+\end{frame}
+
+\section{Networks and tree decomposition}
+
+\subsection{Concrete and abstract networks}
+\begin{frame}
+\frametitle{Soft Constraints and concrete networks}
+\begin{itemize}
+	\item We assume $\mathcal{E}_C$ to be a ranked alphabet of soft constraints, equipped with
+	an arity function $ar: \mathcal{E}_C \rightarrow \mathbb{N}$ and a set of variables 
+	$\mathbb{V}$
+\medskip
+	\item A \emph{concrete network} is a pair $I \blacktriangleright N$ where
+	\begin{itemize}
+		\item $N = (V_N, E_N, a_N, lab_N)$ is a labelled hypergraph over $\mathcal{E}_C$
+		with no isolated vertices
+		\item Vertices are a subset of $\mathbb{V}$
+		\item $I$ is a set of interface variables
+	\end{itemize}
+\medskip
+	\item We also assume that $\mathcal{E}_C$ has a function 
+	$var: \mathcal{E}_C \rightarrow \mathbb{V}^*$ which assigns a tuple of distinct canonical
+	variables to each constraint, i.e. $var(A) \cap var(B) = \emptyset$ if $A \neq B$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+   \begin{itemize}
+	\item $A, B$ constraints with $ar(A) = ar(B) = 2$
+	\item $var(A) = (x_1, x_2)$, $var(B) = (x_3, x_4)$
+	\item $V_N = \{x,y,z\}$, $E_N = \{e_1,e_2\}$
+	\item $a_N(e_1) = \langle x, y \rangle$, $a_N(e_2) = \langle y, z \rangle$
+	\item $lab_N(e_1) = A$, $lab_N(e_2) = B$	
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+	\begin{itemize}
+		\item The concrete network $\{y\} \blacktriangleright N$:
+	\end{itemize}
+    \begin{center}
+     \includegraphics[width=0.6\textwidth]{con_net.png}      
+    \end{center}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Soft Constraint Satisfaction Problems}
+\begin{itemize}
+	\item A Soft Constraint Satisfaction Problem (SCSP) is a tuple 
+	$(I \blacktriangleright N, \mathbb{D}, S, val)$
+\medskip
+	\item A \emph{value} $val_A$ is a function giving a cost in $S$ to each assignement of 
+	canonical variables in $A$
+	\begin{itemize}
+		\item We will use $val_e$ as a function giving a cost to every assignement to variables
+		$e$ is attached to
+	\end{itemize}
+\medskip
+	\item Variables $I$ are those of interest
+\medskip
+	\item The solution is a function $sol: (I \rightarrow \mathbb{D}) \rightarrow S$: for each
+	assignement $\rho: I \rightarrow \mathbb{D}$
+	    \[ sol(\rho) = \bigoplus_{\{ \rho': V_N \rightarrow \mathbb{D} \mid 
+		\rho' \downarrow_I = \rho \}} (\bigotimes_{\{i \mid e_i \in E_N \}}val_e(\rho' 
+		\downarrow_{a_N(e_1)})) \]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{A canonical representative for networks}
+\begin{itemize}
+	\item Since we are interested only in interface variables, we can define isomorphisms
+	between networks
+		\item Then two networks are isomorphic if there is an isomorphism between them
+		preserving the interface variables
+		\item An abstract network $I \triangleright N$ is an isomorphism class of concrete
+		networks
+		\item In the following we assume the choice of a canonical representative of abstract
+		networks
+\end{itemize}
+\end{frame}
+
+\subsection{Tree decomposition}
+\begin{frame}
+\frametitle{Tree decomposition}
+\begin{itemize}
+	\item A decomposition of a graph can be represented as a tree decomposition
+	\begin{itemize}
+		\item Each vertex is a piece of the graph
+	\end{itemize}
+\medskip
+	\item A (rooted) tree decomposition of a hypergraph G is a pair $\mathcal{T} = (T,X)$ where
+	$T$ is a rooted tree and $X = \{ X_t\}_{t \in V_T}$ is a family of subset of $V_G$ s.t.
+	\begin{itemize}
+		\item For each vertex $v \in V_G$ there exists a vertex of $\mathcal{T}$ s.t.
+		$v \in X_t$
+		\item For each hyperedge $e \in E_G$ there is a vertex of $\mathcal{T}$ s.t. 
+		$a_G(e) \subseteq X_t$
+		\item Each subtree generated from $v \in V_G$ is a rooted tree
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Tree decomposition}
+\begin{frame}
+\frametitle{Tree decomposition}
+\begin{itemize}
+	\item The decomposition of a network $I \triangleright N$ is a decomposition of $N$ where we 
+	choose as a root a vertex of $\mathcal{T}$ containing all the interface variables
+\medskip
+	\item We'll provide a translation from tree decompositions to SCEP (weak) terms: this will
+	enable applying algebraic techniques to tree decompositions
+\medskip
+	\item We'll refer to \emph{completed versions} of tree decompositions, which explicitly
+	associate components of $N$ to vertices of $\mathcal{T}$
+	\begin{itemize}
+		\item for each $v \in V_N (e \in E_N)$, $t_v (t_e)$ is the vertex closest to the root
+		of $\mathcal{T}$ s.t. $v \in X_{t_v}$
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\subsection{SCEP specification}
+\begin{frame}
+\frametitle{SCEP signature}
+\begin{itemize}
+	\item SCEP algebras are \emph{permutation algebras}
+\medskip
+	\item The SCEP-signature (\emph{s-signature}) is given by the following grammar:
+	\begin{center}
+		$p,q := p \mid \mid q \mid (x)p \mid p \pi \mid A(\widetilde{x}) \mid nil$
+	\end{center}
+\medskip
+	\item The free variables of $p$ ($fv(p)$) are defined recursevly as expected
+	\begin{itemize}
+		\item the restriction $(x)$ is a bounding operator
+		\item the free variables of $p \pi$ are just $\pi (fv(p))$
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Strong SCEP specification}
+\begin{itemize}
+	\item A certain set of axioms toghether with the signature give the strong SCEP specification
+	(\emph{s-specification})
+	\begin{itemize}
+		\item $\mid \mid$ forms a commutative monoid
+		\item Restrictions can be swapped and $\alpha$-converted
+		\item Permutations distribute over syntactic operators
+	\end{itemize}		
+\end{itemize}
+\begin{center}
+	\includegraphics[width=0.75\textwidth]{s-axioms.png}      
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Weak SCEP specification}
+\begin{itemize}
+	\item The axiom $AX_{SE}$ in the s-specification states that the scope of restricted
+	variables can be narrowed to terms where they occur free
+\medskip
+	\item This cause s-terms with different decompositions to be equivalent
+\medskip
+	\item To distinguish different decompositions, we define a \emph{weak} SCEP specification
+	(\emph{w-specification}) where $AX_{SE}$ is replaced with
+	\begin{center}
+		($AX_{(x)}^w$) \ $(x)p \equiv_w p$ \ \ $(x \not \in fv(p))$
+	\end{center}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Normal and canonical form}
+\begin{itemize}
+	\item W-terms can be seen as networks having a hierarchical structure
+\medskip
+	\item Normal and canonical forms are those of interest
+\medskip
+	\item A w-term is said to be in normal form whenever it is of the form
+	$(\widetilde{x})(A_1(\widetilde{x_1}) \mid \mid ... \mid \mid A_n(\widetilde{x_n}))$
+\medskip
+	\item A w-term is said to be in canonical form whenever is obtained by the repeated
+	application of ($AX_{SE}$) until termination
+\medskip
+	\item As we'll see, a term's form have an impact on its evaluation complexity
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Soundness and completeness of networks}
+\begin{itemize}
+	\item The s-specification is sound and complete w.r.t. networks
+\medskip
+	\item We can define a translation function which, given a concrete network 
+	$I \blacktriangleright N$, gives us the corresponding s-term and viceversa
+	\begin{itemize}
+		\item $term(I \blacktriangleright N) = (V_N \setminus I) 
+		(A_1(\widetilde{x_1}) \mid \mid ... \mid \mid A_n(\widetilde{x_n}))$
+		\item $net(p) = fv(p) \blacktriangleright N_p$
+	\end{itemize}
+\medskip
+	\item Completeness follows by the fact that if $net(n_1) \cong net(n_2)$, then
+	$n_1 \equiv_s n_2$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{SCSPs as SCEPs}
+\begin{itemize}
+	\item SCSPs can be represented and solved as SCEPs
+\medskip
+	\item SCEPs are indeed more general than SCSPs
+	\begin{itemize}
+		\item There exist optimisation problems which are SCEPs and cannot be represented
+		as SCSPs
+	\end{itemize}
+\medskip
+	\item Thus we can define an algebra $\mathcal{V}$ s.t. 
+	$[\![ I \triangleright N ]\!]^{\mathcal{V}}$ gives the solution of the SCSP defined
+	over the network
+\medskip
+	\begin{itemize}
+		\item[Theorem] Given an SCSP with underlying network $I \triangleright N$ and
+		value functions $val_A$, we have that $I \triangleright N$ evaluated in $\mathcal{V}$
+		($[\![ I \triangleright N ]\!]^{\mathcal{V}}$) is its solution
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Evaluation Complexity}
+
+\begin{frame}
+\frametitle{Evaluation Complexity}
+\begin{center}
+	\includegraphics[width=1\textwidth]{complexity.png}      
+\end{center}
+\begin{itemize}
+	\item We now introduce a notion of complexity of w-terms ($\langle \langle - \rangle \rangle$)
+\medskip
+	\item The complexity of $p$ ($\langle \langle p \rangle \rangle$) is the maximum "size" of
+	elements of an algebra $\mathcal{A}$ computed while inductively constructing 
+	$[\![ p ]\!]^{\mathcal{A}}$
+\medskip
+	\begin{itemize}
+		\item[Theorem] Given a term $p$, let $n$ be its normal form. For all canonical
+		forms $c$ of $p$ we have $\langle \langle c \rangle \rangle \leq \langle \langle n
+		\rangle \rangle$
+	\end{itemize}
+\end{itemize}
+\medskip
+
+\end{frame}
+
+\subsection{Tree decompositions as w-terms}
+
+\begin{frame}
+\frametitle{Tree decompositions as w-terms}
+	\begin{itemize}
+		\item Given a network $I \triangleright N$, 
+		let $\mathcal{CT} = (\mathcal{T}, \{ t_x \}_{x \in E_N \cup V_N})$ the completed
+		version of one of its tree decompositions
+	\medskip
+		\item We translate $\mathcal{CT}$ into a w-term:
+		\begin{itemize}
+			\item Given $t \in T$, let $V(t) = \{ v \in V_N \mid t_v = t \}$ and 
+			$E(t) = \{ e \in E_N \mid t_e = t \}$
+			\item Suppose $t$ has children $t_1,...,t_n$ and $E(t) ) \{ e_1,...,e_k \}$
+			\item Let $\widetilde{x} = V(t) \setminus I$
+		\end{itemize}
+	\medskip
+		\item The term $\chi(t)$ is inductively defined as:
+		\begin{center}
+			$\chi(t) = (\widetilde{x})(A_1(\widetilde{x_1}) \mid \mid 
+			... \mid \mid A_k(\widetilde{x_k}) \mid \mid \chi(t_1) \mid \mid 
+			... \mid \mid \chi(t_n))$
+		\end{center}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Tree decompositions as w-terms}
+\begin{itemize}
+	\item Given a tree decomposition of $\mathcal{T}$ rooted in $r$, the corresponding
+	w-term $wterm(\mathcal{T})$ is $\chi(r)$ computed on the completed version 
+	of $\mathcal{T}$
+\medskip
+	\item $wterm(\mathcal{T})$ correctly represents the network $\mathcal{T}$ decomposes:
+	if $\mathcal{T}$ is a tree decomposition for $I \triangleright N$, then 
+	$[\![ wterm(\mathcal{T}) ]\!]^{\mathcal{N}} = I \triangleright N$
+\medskip
+	\item Furthermore, given a tree decomposition $\mathcal{T}$, we have 
+	$\langle \langle wterm(\mathcal{T}) \rangle \rangle \leq width(\mathcal{T})$
+	
+\end{itemize}
+\end{frame}
+
+\subsection{Computing Canonical Decomposition}
+
+\begin{frame}
+\frametitle{An algorithm for computing canonical decomposition}
+\begin{itemize}
+	\item Based on \emph{bucket elimination}
+	\begin{itemize}
+		\item Differently from it, the introduced algorithm produces all and only
+		canonical terms
+	\end{itemize}
+\medskip
+	\item Here putting a constraint in the bucket of its last variable means to apply
+	the $(AX_{SE})$ axiom
+\medskip
+	\item The input are an s-term $(R)A$ in normal form and a total order $O_R$ over $R$
+\medskip
+	\item The output is a w-term $P$ in canonical form
+\medskip
+	\begin{itemize}
+		\item[Theorem] $C$ is a canonical form of $R(A)$ if and only if there 
+		is $O_R^C$ s.t. the algorithm with inputs $(R)A$ and $O_R^C$ outputs $C$
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{An algorithm for computing canonical decomposition}
+\begin{center}
+	\includegraphics[width=0.9\textwidth]{algorithm.png}
+\end{center}
+\end{frame}
+
+\section{The algebra of Polyadic Soft Constraints}
+
+\subsection{PSC as an interpretation of the initial algebra}
+
+\begin{frame}
+\frametitle{PSC as an interpretation of the initial algebra}
+\begin{itemize}
+	\item We define the algebra $\mathcal{P}$ of polyadic soft constraints
+\medskip
+	\item Constants are $A^{\mathcal{P}}(x_1,...,x_n)\eta = 
+	c_{(x_1,...,x_n)}(\eta \circ \widehat{\sigma})$, \ $nil^{\mathcal{P}} = 0$
+\medskip
+	\item Operations are
+	\begin{itemize}
+		\item $((X)^{\mathcal{P}} c) \eta = (\exists_X c)\eta = 
+		\bigvee_\rho \{ c\rho \mid \eta_{\mid_{\mathbb{V} 
+		\setminus X}} = \rho_{\mid_{\mathbb{V} \setminus X}}\}$
+		\item $c \pi^{\mathcal{P}} = (s_\pi c)\eta = c(\eta \circ \pi)$
+		\item $c_1 \mid \mid^{\mathcal{P}} c_2 = (c_1\eta) \otimes (c_2\eta)$
+	\end{itemize}
+\medskip 
+	\item $\widehat{\sigma}$ is used to map $var(A)$ to $\langle x_1, ..., x_n \rangle$
+\end{itemize}
+\end{frame}
+
+\subsection{Weak and strong axioms for $\mathcal{P}$}
+
+\begin{frame}
+\frametitle{Weak and strong axioms for $\mathcal{P}$}
+\begin{itemize}
+	\item Axioms for $\alpha$-conversion and swapping of restrictions hold in $\mathcal{P}$,
+	as well as those involving permutations and parallel composition
+\medskip
+	\item $\mathcal{P}$ is a w-algebra: it holds $(\exists_X c)\eta = c\eta$ 
+	if $X \cap supp(c) = \emptyset$ ($AX_{(x)}^w$)
+\medskip
+	\item $\mathcal{P}$ is an s-algebra: it holds $X \cap supp(c2) = \emptyset \implies
+	(\exists_X(c_1 \otimes c_2))\eta = (\exists_X(c_1 \otimes \exists_X c_2))\eta =
+	(\exists_X c_1 \otimes \exists c_2)\eta = (\exists_X c_1)\eta \otimes (\exists_X c_2)\eta = 
+	(\exists_X c_1)\eta \otimes c_2\eta$
+\end{itemize}
+\end{frame}
+
+\section{Example}
+
+%\begin{frame}
+%\frametitle{Example}
+%\begin{itemize}
+%	\item Suppose we have two services, $A$ and $B$, accepting $n$ requests 
+%\medskip
+%	\item We have $m$ clients, each one associated with a certain probability to be served 
+%	\begin{itemize}
+%		\item We have independent probabilities
+%		\item For each client, the probability to be served by $A$ or $B$ are different
+%	\end{itemize}
+%\medskip
+%	\item Suppose that $k$ of the clients which ask for $A$'s services
+%	ask for $B$'s services too, with $k < n$
+%\medskip
+%	\item We want to maximize the probability for a certain group to be served
+%\end{itemize}
+%\end{frame}&^
+
+%\begin{frame}
+%\frametitle{Example}
+%\begin{itemize}
+%	\item Two constraints: ${serve_A}_{(x_1,...,x_n)}$ and 
+%	${serve_B}_{(x_1,...,x_k,x_{n+1},...,x_{n+k})}$
+%\medskip
+%	\item The domain is $\mathbb{N}$ and $S$ is the \emph{probabilistic} semiring 
+%	$\langle [0,1], \leq, \times, 1 \rangle$
+%\medskip
+%	\item The clients for which we want to maximize the probabilities are $x_1,...,x_l$, 
+%	and $x_{n+1},...,x_{n+l}$, $l < k$
+%\medskip
+%	\item An example network for $n = 3$:
+%\end{itemize}
+%\begin{center}
+%	\includegraphics[width=0.55\textwidth]{concr_example.png}
+%\end{center}
+%\end{frame}
+
+%\begin{frame}
+%\frametitle{Example}
+%\begin{itemize}
+%	\item The problem in normal form is:
+%\end{itemize}
+%	\[ (\exists_{\{x_1',...,x_l'\}}\exists_{\{x_{n+1}',...,x_{n+l}'\}}
+%	({serve_A}_{(x_1',...,x_n')} \times 
+%	\exists_{\{x_1',...,x_l'\}}{serve_B}_{(x_1',...x_{n+k}')}))\eta\]
+%\begin{itemize}
+%	\item The problem in canonical form is:
+%\end{itemize}
+%	\[ (\exists_{\{x_1',...,x_l'\}}{serve_A}_{(x_1',...,x_n')})\eta \times 
+%	(\exists_{\{x_1',...,x_l'\}}\exists_{\{x_{n+1}',...,x_{n+l}'\}}
+%	{serve_B}_{(x_1',...x_{n+k}')})\eta\]
+%\begin{itemize}
+%	\item While in normal form we have $\langle \langle n \rangle \rangle = n+k$, the canonical
+%	form allows for solving the two subproblems and then combine their solutions:
+%	$\langle \langle c \rangle \rangle = n$
+%\end{itemize}
+%\end{frame}
+
+\begin{frame}
+\frametitle{Example}
+\begin{itemize}
+	\item Consider a network where meeting activities for a group require the existence of paths
+	between every pair of collaborators
+\medskip
+	\item We assume that the network is composed of end-to-end two-way connections with
+	independent probabilities of failure
+\medskip
+	\item We want to find the probability of a certain group to stay connected
+\medskip
+	\item We consider a graph with probabilities associated to each edge: the solution is the
+	probability of some interface vertices staying connected
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example}
+\begin{itemize}
+	\item We evaluate networks $I \triangleright N$ into an algebra of probability distributions
+	on the partitions of $I$ ($Part(I)$)
+\medskip
+	\item If we are interested in a group $J$, we compute the probability distribution $P$ for
+	$J \triangleright N$ and then we select $P(\{J\})$
+\medskip
+	\item Let us focus on parallel composition, defined as:
+\end{itemize}
+		\[ [\![ I_1 \triangleright N_1 \mid \mid I_2 \triangleright N_2 ]\!]^{\mathcal{D}}\Pi =
+		\sum_{\Pi' \in Part(I \cup {x}) \mid \Pi'-x = \Pi} 
+		[\![ I_1 \triangleright N_1 ]\!]^{\mathcal{D}}\Pi_1 \times
+		[\![ I_2 \triangleright N_2 ]\!]^{\mathcal{D}}\Pi_2 \]
+\begin{itemize}
+	\item Here $\Pi \in Part(I_1 \cup I_2)$ and each $\Pi_1$, $P_2$ must belong to $Part(I_1)$
+	and $Part(I_2)$ respectively. The $\cup$ operator produces the finest partition coarser than 
+	the two components and $\times$ is the multiplication on reals
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Formal specification}
+\begin{itemize}
+	\item Considered networks are wheels $W_k(v,x)$
+\medskip
+	\item For $k = 2$ we have the following graph:
+\end{itemize}
+\begin{center}
+	\includegraphics[width=1\textwidth]{wheel.png}      
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Non existence of an SCSP formulation}
+\begin{itemize}
+	\item The given SCEP does not fit the SCSP format
+\medskip
+	\item Suppose to define the problem as an SCSP:
+	\begin{itemize}
+		\item a partition in $Part(I)$ can be represented as an assignment of variables $I$
+		\item the solution is the probabilty $sol(\Pi)$ associated to a partition $\Pi$
+	\end{itemize}
+\medskip
+	\item The solution in the SCSP case, for any two networks, is 
+	$val_{N_1}(\Pi_1) \otimes val_{N_2}(\Pi_2)$
+	\begin{itemize}
+		\item The solution considers only the probabilities caused by the same $\Pi$ on the
+		two subnetworks
+	\end{itemize}
+	\item This is not compatible with the given definition of parallel composition
+\end{itemize}
+\end{frame}
+
+\section{References}
+
+\begin{frame}
+\frametitle{References}
+\begin{itemize}
+	\item \emph{U. Montanari, M. Sammartino, A. Tcheukam} - Decomposition Structures for
+	Soft Constraint Evaluation Problems: An Algebraic Approach
+\medskip
+	\item \emph{F. Bonchi, L. Bussi, F. Gadducci, F. Santini} - Polyadic Soft Constraints
+\end{itemize}
+\end{frame}
+
+\section{Conclusions}
+
+\begin{frame}
+\frametitle{Conclusions}
+\begin{itemize}
+	\item We saw an algebraic framework for defining and solving SCEPs
+\medskip
+	\item We also saw as polyadic soft constraints can be seen as an s-algebra or
+	a w-algebra
+\medskip
+	\item Using these frameworks, we can apply dynamic programming to SCSPs, thus improving
+	their complexity
+\end{itemize}
+\end{frame}
+
+\end{document}
